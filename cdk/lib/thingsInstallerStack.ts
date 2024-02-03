@@ -9,18 +9,36 @@ interface Props extends cdk.StackProps {
 }
 
 export class ThingsInstallerStack extends cdk.Stack {
+  region: string;
   projectPrefix: string;
   installerRoleName: string;
-  installerGroupName: string;
+  thingName: string;
+  thingGroupName: string;
   createIotThingGroupLambdaName: string;
   createIotRoleAliasLambdaName: string;
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
+    if (!props.env) {
+      throw new Error("env is required");
+    }
+    if (!props.env.region) {
+      throw new Error("env.region is required");
+    }
+    this.region = props.env.region;
     this.projectPrefix = props.projectName;
     this.installerRoleName = "InstallerRole";
-    this.installerGroupName = "InstallerGroup";
+    this.thingName = "MyThing";
+    this.thingGroupName = "MyThingGroup";
     this.createIotThingGroupLambdaName = "CreateIotThingGroupLambda";
     this.createIotRoleAliasLambdaName = "CreateIotRoleAliasLambda";
+    this.exportOutput({
+      key: "Region",
+      value: this.region,
+    });
+    this.exportOutput({
+      key: "ThingName",
+      value: this.thingName,
+    });
     this.createCredential();
     this.createIotThingGroup();
     this.createIoTRoleAlias("GreengrassV2TokenExchangeRole");
@@ -71,8 +89,13 @@ export class ThingsInstallerStack extends cdk.Stack {
     new cdk.CustomResource(this, "CreateIotGroupCustomResource", {
       serviceToken: provider.serviceToken,
       properties: {
-        ThingGroupName: this.installerGroupName,
+        ThingGroupName: this.thingGroupName,
       },
+    });
+
+    this.exportOutput({
+      key: "ThingGroupName",
+      value: this.thingGroupName,
     });
   }
 
@@ -244,7 +267,7 @@ export class ThingsInstallerStack extends cdk.Stack {
   }
 
   exportOutput({ key, value }: { key: string; value: string }) {
-    new cdk.CfnOutput(this, `Output-${key}`, {
+    new cdk.CfnOutput(this, key, {
       exportName: `${this.projectPrefix}-${key}`,
       value: value,
     });

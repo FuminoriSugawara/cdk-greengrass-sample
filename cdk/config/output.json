@@ -1,7 +1,0 @@
-{
-  "ThingsInstallerStack": {
-    "OutputIoTTokenRoleAlias": "ThingsInstaller-GreengrassV2TokenExchangeRoleAlias",
-    "OutputInstallerTempRoleARN": "arn:aws:iam::268545994326:role/ThingsInstaller-InstallerRole",
-    "OutputIoTTokenRole": "ThingsInstaller-GreengrassV2TokenExchangeRole"
-  }
-}
